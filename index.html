@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Рождественский творческий вечер — заявка</title>
+<style>
+:root{--bg1:#eceaf1;--bg2:#d9d8e2;--tx:#16171c;--mut:#5d6270;--glass:rgba(255,255,255,.55);--edge:rgba(255,255,255,.95);--edge2:rgba(20,22,30,.12);--ind:rgba(255,255,255,.95);--btn:#16171c;--btnt:#fff;--ac:#e5484d;--sh:0 10px 30px rgba(20,22,40,.12);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#20212b;--bg2:#0b0c10;--tx:#f2f3f7;--mut:#a3a8b5;--glass:rgba(255,255,255,.07);--edge:rgba(255,255,255,.26);--edge2:rgba(255,255,255,.14);--ind:rgba(255,255,255,.16);--btn:#f2f3f7;--btnt:#14151a;--ac:#ff6b70;--sh:0 14px 40px rgba(0,0,0,.45);color-scheme:dark}}
+:root[data-theme="dark"]{--bg1:#20212b;--bg2:#0b0c10;--tx:#f2f3f7;--mut:#a3a8b5;--glass:rgba(255,255,255,.07);--edge:rgba(255,255,255,.26);--edge2:rgba(255,255,255,.14);--ind:rgba(255,255,255,.16);--btn:#f2f3f7;--btnt:#14151a;--ac:#ff6b70;--sh:0 14px 40px rgba(0,0,0,.45);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;color:var(--tx);background-color:var(--bg2);background-image:linear-gradient(180deg,var(--bg1),var(--bg2));background-attachment:fixed;font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none;filter:blur(36px);opacity:.9;
+background:linear-gradient(112deg,transparent 18%,rgba(255,255,255,.10) 26%,transparent 34%,transparent 52%,rgba(255,255,255,.07) 60%,transparent 68%),radial-gradient(60% 40% at 80% 0%,rgba(255,255,255,.14),transparent 70%)}
+body::after{content:"";position:fixed;left:0;right:0;top:0;height:calc(env(safe-area-inset-top,0px) + 18px);z-index:10;pointer-events:none;background:linear-gradient(var(--bg1),transparent)}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--edge2);box-shadow:var(--sh),inset 0 1px 0 var(--edge)}
+@media (prefers-reduced-transparency:reduce){.glass,.in{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--bg1)}}
+@media (prefers-contrast:more){.glass,.in{border-color:var(--tx)}}
+.w{max-width:620px;margin:0 auto;padding:22px 16px 130px}
+.hero{text-align:center;padding:14px 0 22px}
+.hero .s{font-size:38px}
+h1{font-size:clamp(30px,8.4vw,42px);line-height:1.04;letter-spacing:-.03em;font-weight:700;margin:6px 0 10px}
+.dt{color:var(--mut);font-size:15px;letter-spacing:.005em}
+h2{font-size:20px;line-height:1.15;letter-spacing:-.015em;margin:0 0 6px}
+.card{border-radius:28px;padding:20px 18px;margin-bottom:14px}
+.crit{display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:26px;margin-bottom:10px}
+.crit i{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;background:var(--ind);border:1px solid var(--edge2)}
+label,.lb{display:block;font-weight:600;font-size:13px;letter-spacing:.01em;color:var(--mut);margin:18px 6px 8px}
+.in{width:100%;font:inherit;font-size:16px;color:var(--tx);background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--edge2);border-radius:999px;padding:14px 18px;box-shadow:inset 0 1px 0 var(--edge);transition:border-color .15s}
+textarea.in{border-radius:24px;resize:none}
+.in:focus{outline:none;border-color:var(--ac)}
+.in::placeholder{color:var(--mut);opacity:.8}
+.tabs,.seg{position:relative;display:flex;padding:4px;border-radius:999px}
+.seg{background:var(--glass);border:1px solid var(--edge2)}
+.ind{position:absolute;top:4px;bottom:4px;left:0;width:0;border-radius:999px;background:var(--ind);border:1px solid var(--edge2);box-shadow:inset 0 1px 0 var(--edge),0 4px 12px rgba(0,0,0,.12);opacity:0;will-change:transform,width}
+.tabs button,.seg button{position:relative;z-index:1;flex:auto;border:0;background:none;color:var(--tx);font:inherit;font-weight:600;font-size:14px;padding:10px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.seg button{padding:11px 8px}
+.step{display:flex;align-items:center;justify-content:space-between;border-radius:999px;padding:5px;background:var(--glass);border:1px solid var(--edge2)}
+.step button,.round{width:40px;height:40px;border-radius:50%;border:1px solid var(--edge2);background:var(--ind);color:var(--tx);font:inherit;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.val{font-weight:700;font-size:16px;flex:1;text-align:center;white-space:nowrap;will-change:transform}
+.addf{display:flex;align-items:center;gap:12px;width:100%;border:1px solid var(--edge2);background:var(--glass);color:var(--mut);font:inherit;border-radius:999px;padding:12px 18px;cursor:pointer}
+.addf b{color:var(--tx);font-size:26px;font-weight:300;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{display:flex;align-items:center;gap:8px;border-radius:999px;padding:6px 6px 6px 14px;font-size:14px;max-width:100%;background:var(--glass);border:1px solid var(--edge2)}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+.chip button{width:26px;height:26px;border-radius:50%;border:0;background:var(--ind);color:var(--tx);cursor:pointer;font-size:15px;line-height:1}
+.sw{display:flex;gap:14px;align-items:center;margin-top:18px;cursor:pointer;font-size:15px}
+.sw button{position:relative;flex:none;width:52px;height:32px;border-radius:999px;border:1px solid var(--edge2);background:var(--glass);cursor:pointer;padding:0;transition:background .2s}
+.sw button[aria-checked="true"]{background:var(--btn)}
+.knob{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--ind);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.sw button[aria-checked="true"] .knob{background:var(--btnt)}
+.btn{width:100%;border:0;border-radius:999px;padding:16px;margin-top:18px;font:inherit;font-weight:600;background:var(--btn);color:var(--btnt);cursor:pointer}
+.btn:disabled{opacity:.55}
+.msg{border-radius:20px;padding:12px 16px;margin-top:16px;font-size:15px;background:var(--glass);border:1px solid var(--ac)}
+.hint{color:var(--mut);font-size:13px;margin:6px 8px 0}
+.app{border-top:1px solid var(--edge2);padding:14px 0;font-size:14px}.app:first-child{border-top:0}
+.app b{font-size:16px}.app a{color:var(--ac)}
+.dock{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:10px;z-index:20;padding:0 12px}
+.dock .round{width:54px;height:54px;background:var(--glass)}
+#send{background:var(--btn);color:var(--btnt)}
+#scrim{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45)}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:620px;margin:0 auto;border-radius:32px 32px 0 0;padding:10px 22px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;touch-action:none;will-change:transform}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--edge2);margin:0 auto 18px}
+.logo{width:84px;height:84px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;color:var(--tx)}
+.meta{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 16px;color:var(--mut);font-size:15px}.meta span,.nb{white-space:nowrap}
+.dl{display:inline-block;margin-top:14px;padding:7px 16px;border-radius:999px;font-size:13px;font-weight:600}
+h1,h2,.crit div,.hint{text-wrap:balance}.sw span{text-wrap:pretty}.sw>span{flex:1}
+.sw+.sw{margin-top:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}.row2>div{min-width:0}.row2 .lb{white-space:nowrap}
+.q{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--edge2);background:var(--ind);color:var(--tx);font:inherit;font-weight:700;font-size:14px;cursor:pointer;padding:0}
+.scr{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.5)}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,560px);max-height:80vh;z-index:50;border-radius:28px;padding:18px;display:flex;flex-direction:column;will-change:transform}
+.mbody{overflow:auto;overscroll-behavior:contain;font-size:14px;line-height:1.55;padding-right:4px}.mbody p{margin:0 0 10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="hero">
+    <div class="logo glass"><svg width="54" height="54" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".45"/><stop offset="1" stop-color="currentColor" stop-opacity=".07"/></linearGradient></defs><path d="M32 32 L52 52 H12 Z" fill="url(#tg)"/><path d="M32 22 L47 40 H17 Z" fill="url(#tg)"/><path d="M32 14 L42 28 H22 Z" fill="url(#tg)"/><path d="M29 52 V58 H35 V52"/><path d="M32 2 Q32.8 6.2 37 7 Q32.8 7.8 32 12 Q31.2 7.8 27 7 Q31.2 6.2 32 2 Z" fill="currentColor" stroke="none"/><circle cx="36" cy="25" r="1.3" fill="currentColor" stroke="none" opacity=".7"/><circle cx="27" cy="36" r="1.3" fill="currentColor" stroke="none" opacity=".7"/><circle cx="38" cy="45" r="1.3" fill="currentColor" stroke="none" opacity=".7"/></svg></div>
+    <h1>Рождественский <span class="nb">творческий вечер</span></h1>
+    <div class="meta"><span>25 декабря 2026</span><span>Pre-party в 17:00</span><span>Основная часть в 18:00</span></div>
+    <div class="dl glass">Заявки принимаются до 18.12.2026 включительно</div>
+  </div>
+
+  <section id="v-about" hidden>
+    <div class="crit glass"><i>1</i><div>Основная тема номера&nbsp;— Христос, отношения с&nbsp;Ним или&nbsp;Рождество</div></div>
+    <div class="crit glass"><i>2</i><div>Длительность номера&nbsp;— не&nbsp;более 4&nbsp;минут</div></div>
+    <div class="crit glass"><i>3</i><div>В&nbsp;номере не&nbsp;более 6&nbsp;участников</div></div>
+  </section>
+
+  <section id="v-form">
+    <div id="closed" class="card glass" hidden><h2>Приём заявок завершён</h2><div class="dt">Заявки принимались до 18.12.2026 включительно.</div></div>
+    <form id="f" class="card glass" onsubmit="return false" style="will-change:transform">
+      <h2>Заявка на участие</h2>
+      <input id="hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0">
+      <label for="fio">ФИО</label>
+      <input class="in" id="fio" autocomplete="name" placeholder="Иванов Иван Иванович">
+      <label for="ph">Номер телефона</label>
+      <input class="in" id="ph" type="tel" autocomplete="tel" placeholder="+7 (900) 000-00-00">
+      <label for="ttl">Название номера</label>
+      <input class="in" id="ttl" placeholder="Например: «Рождественская песня»">
+
+      <label for="tpc">Тема номера</label>
+      <input class="in" id="tpc" maxlength="200" placeholder="О чём ваш номер?">
+      <div class="hint">Тема — Христос, отношения с Ним или Рождество</div>
+
+      <div class="row2">
+        <div><div class="lb">Участники</div>
+          <div class="step" id="sn"><button type="button" aria-label="Меньше">−</button><span class="val"></span><button type="button" aria-label="Больше">+</button></div></div>
+        <div><div class="lb">Длительность</div>
+          <div class="step" id="sd"><button type="button" aria-label="Меньше">−</button><span class="val"></span><button type="button" aria-label="Больше">+</button></div></div>
+      </div>
+      <div class="hint">Не более 6 участников и 4 минут</div>
+
+      <label for="ds">Коротко о номере (необязательно)</label>
+      <textarea class="in" id="ds" rows="3" placeholder="Жанр, что нужно: микрофоны, фонограмма, реквизит…"></textarea>
+
+      <div class="lb">Видео и аудио (необязательно)</div>
+      <button type="button" class="addf press" id="add"><b>+</b>Добавить файл</button>
+      <input id="fl" type="file" accept="video/*,audio/*" multiple hidden>
+      <div class="chips" id="chips"></div>
+      <div class="hint">До 20 МБ на файл, не более 3 файлов (всего до 40 МБ). Если больше — вставьте ссылку ниже.</div>
+
+      <label for="lk">Ссылка на запись (необязательно)</label>
+      <input class="in" id="lk" type="url" placeholder="https://…">
+
+      <div class="sw"><button type="button" role="switch" aria-checked="false" id="c1" aria-label="Подтверждаю соответствие критериям"><span class="knob"></span></button>
+        <span id="c1t">Номер соответствует критериям: тема, до&nbsp;4&nbsp;минут, не&nbsp;более 6&nbsp;участников</span></div>
+      <div class="sw"><button type="button" role="switch" aria-checked="false" id="c2" aria-label="Согласие на обработку персональных данных"><span class="knob"></span></button>
+        <span id="c2t">Даю согласие на&nbsp;обработку персональных данных</span>
+        <button type="button" class="q press" id="qc" aria-label="Текст согласия">?</button></div>
+
+      <div id="m"></div>
+      <button class="btn press" id="b">Отправить заявку</button>
+    </form>
+    <div id="done" class="card glass" hidden><h2>Заявка отправлена</h2><div class="dt">Спасибо! Мы свяжемся с вами по указанному номеру.</div></div>
+  </section>
+
+</div>
+
+<nav class="dock">
+  <div class="tabs glass" id="dock" role="tablist">
+    <span class="ind"></span>
+    <button data-v="about" class="press" role="tab">Критерии</button>
+    <button data-v="form" class="press" role="tab">Заявка</button>
+  </div>
+  <button class="round glass press" id="send" aria-label="Отправить заявку"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+</nav>
+
+<div id="scrim2" class="scr" hidden></div>
+<div class="modal glass" id="cm" role="dialog" aria-modal="true" aria-labelledby="cmt" hidden>
+  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px"><h2 id="cmt" style="flex:1;margin:0">Согласие на обработку персональных данных</h2><button type="button" class="round press" id="cx" aria-label="Закрыть" style="width:34px;height:34px;font-size:15px;flex:none">✕</button></div>
+  <div class="mbody">
+    <p>Я, действуя свободно, своей волей и в&nbsp;своём интересе, в&nbsp;соответствии со&nbsp;ст.&nbsp;9 Федерального закона от&nbsp;27.07.2006 №&nbsp;152-ФЗ «О&nbsp;персональных данных» даю согласие организатору мероприятия «Рождественский творческий вечер» (далее&nbsp;— Оператор) на&nbsp;обработку моих персональных данных на&nbsp;следующих условиях.</p>
+    <p><b>1. Данные.</b> Фамилия, имя, отчество; номер телефона; сведения о&nbsp;номере (название, тема, число участников, длительность, описание); видео- и&nbsp;аудиофайлы и&nbsp;ссылки на&nbsp;записи, которые я&nbsp;прикрепляю к&nbsp;заявке.</p>
+    <p><b>2. Цели.</b> Рассмотрение заявки, организация моего участия в&nbsp;мероприятии, связь со&nbsp;мной по&nbsp;вопросам участия, подготовка программы вечера.</p>
+    <p><b>3. Действия.</b> Сбор, запись, систематизация, накопление, хранение, уточнение, использование, передача (предоставление доступа) лицам, участвующим в&nbsp;организации мероприятия, удаление и&nbsp;уничтожение. Обработка осуществляется с&nbsp;использованием средств автоматизации и&nbsp;без них. Я&nbsp;понимаю, что заявка передаётся Оператору с&nbsp;помощью интернет-сервисов, используемых для приёма заявок (в&nbsp;том числе мессенджеров), и&nbsp;эти сервисы могут находиться за&nbsp;пределами Российской Федерации.</p>
+    <p><b>4. Срок.</b> Согласие действует с&nbsp;момента отправки заявки до&nbsp;достижения целей обработки либо до&nbsp;его отзыва.</p>
+    <p><b>5. Отзыв.</b> Согласие можно отозвать в&nbsp;любой момент, направив Оператору письменное обращение тем способом связи, который использовался для подачи заявки. После отзыва Оператор прекращает обработку и&nbsp;уничтожает данные в&nbsp;срок, установленный законом, кроме случаев, когда хранение требуется по&nbsp;закону.</p>
+    <p><b>6. Другие лица.</b> Если в&nbsp;заявке указаны данные других участников номера, я&nbsp;передаю их с&nbsp;ведома этих лиц, а&nbsp;данные несовершеннолетних&nbsp;— с&nbsp;согласия их законных представителей.</p>
+  </div>
+</div>
+<div id="scrim" hidden></div>
+<div class="sheet glass" id="sheet" hidden>
+  <div class="grab"></div>
+  <div class="logo glass" style="width:68px;height:68px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <h2>Заявка отправлена</h2>
+  <div class="dt">Спасибо! Мы свяжемся с вами по указанному номеру.</div>
+  <button class="btn press" id="ok">Готово</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const RM=matchMedia("(prefers-reduced-motion: reduce)");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* Пружина: damping — перелёт (1 = без), response — скорость (с). Ретаргет сохраняет скорость. */
+function Spring(x0,apply,d=1,r=.4){
+  let x=x0,v=0,to=x0,raf=0,last=0;const w=6.2832/r,k=w*w,c=2*d*w;
+  const s={end:null,get x(){return x},get v(){return v},
+    go(t,v0){ if(RM.matches){s.set(t);if(s.end){const f=s.end;s.end=null;f()}return} to=t;if(v0!==undefined)v=v0;if(!raf){last=performance.now();raf=requestAnimationFrame(tick)} },
+    set(t){cancelAnimationFrame(raf);raf=0;x=to=t;v=0;apply(x)},
+    stop(){cancelAnimationFrame(raf);raf=0}};
+  function tick(t){
+    const dt=Math.min((t-last)/1000,.033);last=t;const n=Math.max(1,Math.ceil(dt/.004)),h=dt/n;
+    for(let i=0;i<n;i++){v+=(-k*(x-to)-c*v)*h;x+=v*h}
+    if(Math.abs(x-to)<.002*(1+Math.abs(to))&&Math.abs(v)<.02){x=to;v=0;raf=0;apply(x);if(s.end){const f=s.end;s.end=null;f()}return}
+    apply(x);raf=requestAnimationFrame(tick)}
+  return s}
+const rubber=(o,dim,c=.55)=>(o*dim*c)/(dim+c*Math.abs(o));
+const project=(v,d=.998)=>(v/1000)*d/(1-d);
+
+/* Мгновенный отклик на нажатие */
+function press(el){const s=Spring(1,v=>el.style.transform=v===1?"":`scale(${v})`,.8,.28);
+  el.addEventListener("pointerdown",()=>s.go(.95));
+  ["pointerup","pointerleave","pointercancel"].forEach(e=>el.addEventListener(e,()=>s.go(1)))}
+document.querySelectorAll(".press").forEach(press);
+
+/* Сегмент со «стеклянным» индикатором на пружинах */
+function Seg(root,onSel){
+  const ind=root.querySelector(".ind"),items=[...root.querySelectorAll("[data-v]")];
+  const sx=Spring(0,x=>ind.style.transform=`translateX(${x}px)`,.85,.36),sw=Spring(0,w=>ind.style.width=w+"px",.85,.36);
+  let cur=-1;
+  function place(i,anim){const b=items[i];if(!b||b.hidden)return;ind.style.opacity=1;
+    if(anim){sx.go(b.offsetLeft);sw.go(b.offsetWidth)}else{sx.set(b.offsetLeft);sw.set(b.offsetWidth)}}
+  function sel(i,anim=true){const first=cur<0;cur=i;items.forEach((e,j)=>e.setAttribute("aria-selected",j===i));place(i,anim&&!first);onSel&&onSel(items[i].dataset.v)}
+  items.forEach((b,i)=>b.addEventListener("click",()=>sel(i)));
+  return{sel,relayout(){if(cur>=0)place(cur,false)},get value(){return cur>=0?items[cur].dataset.v:""}}}
+
+/* Переходы между разделами: симметричный путь, материализация (blur + сдвиг) */
+const order=["about","form"],views={about:$("v-about"),form:$("v-form")};
+let curV="form";const closed=new Date()>=new Date(2026,11,19);
+let sent=false,busy=false;
+const sendS=Spring(1,s=>{const e=$("send");e.style.opacity=Math.min(1,Math.max(0,s));e.style.transform=`scale(${.6+.4*Math.min(1,s)})`;e.style.pointerEvents=s>.5?"auto":"none"},.8,.35);
+function show(n){
+  if(n===curV)return;const dir=order.indexOf(n)>order.indexOf(curV)?1:-1;
+  views[curV].hidden=true;curV=n;const el=views[n];el.hidden=false;
+  const p=Spring(0,v=>{const f=v>.995;el.style.opacity=f?"":v;el.style.transform=f?"":`translate3d(${(1-v)*dir*36}px,0,0)`;el.style.filter=f?"":`blur(${(1-v)*6}px)`},1,.45);
+  p.set(0);p.go(1);sendS.go(n==="form"&&!closed&&!sent?1:0)}
+const dock=Seg($("dock"),show);
+requestAnimationFrame(()=>{views.form.hidden=false;dock.sel(1,false);sendS.set(closed?0:1)});
+addEventListener("resize",()=>dock.relayout());
+
+/* Телефон: префикс +7 и маска */
+const ph=$("ph");
+const fmt=r=>{let o="+7 ";if(!r)return o;o+="("+r.slice(0,3);if(r.length>3)o+=") "+r.slice(3,6);if(r.length>6)o+="-"+r.slice(6,8);if(r.length>8)o+="-"+r.slice(8,10);return o};
+ph.addEventListener("focus",()=>{if(!ph.value){ph.value="+7 ";setTimeout(()=>{try{ph.setSelectionRange(3,3)}catch(e){}})}});
+ph.addEventListener("blur",()=>{if(ph.value.replace(/\D/g,"").length<=1)ph.value=""});
+ph.addEventListener("input",e=>{
+  const plus=ph.value.trim().startsWith("+");let d=ph.value.replace(/\D/g,"");if(plus)d=d.slice(1);
+  if(d.length>10&&/^[78]/.test(d)&&(!plus||e.inputType==="insertFromPaste"))d=d.slice(1);
+  ph.value=d?fmt(d.slice(0,10)):"";try{ph.setSelectionRange(ph.value.length,ph.value.length)}catch(_){}});
+
+/* Степперы: отскок значения, упругое сопротивление на границе */
+function Stepper(id,min,max,st,v,fmt){
+  const root=$(id),out=root.querySelector(".val"),[m,p]=root.querySelectorAll("button");
+  const bump=Spring(1,s=>out.style.transform=`scale(${s})`,.5,.35),nud=Spring(0,x=>root.style.transform=`translateX(${x}px)`,.4,.35);
+  out.textContent=fmt(v);
+  function set(nv,dr){if(nv<min||nv>max){nud.set(dr*9);nud.go(0);return}v=nv;out.textContent=fmt(v);bump.set(1.22);bump.go(1)}
+  m.onclick=()=>set(v-st,-1);p.onclick=()=>set(v+st,1);
+  return{get v(){return v}}}
+const sn=Stepper("sn",1,6,1,1,v=>v),sd=Stepper("sd",.5,4,.5,3,v=>String(v).replace(".",",")+" мин");
+
+/* Переключатели */
+function Sw(id,tid){const b=$(id),k=b.querySelector(".knob"),s=Spring(0,x=>k.style.transform=`translateX(${x}px)`,.7,.3);
+  function t(){const on=b.getAttribute("aria-checked")!=="true";b.setAttribute("aria-checked",on);s.go(on?20:0)}
+  b.onclick=t;$(tid).onclick=t;return{get on(){return b.getAttribute("aria-checked")==="true"}}}
+const c1=Sw("c1","c1t"),c2=Sw("c2","c2t");
+
+/* Окно согласия: материализация, закрытие по ✕, фону и Esc */
+const cm=$("cm"),scr2=$("scrim2");
+const cs=Spring(0,p=>{cm.style.opacity=p;scr2.style.opacity=p;cm.style.transform=`translate(-50%,-50%) scale(${.92+.08*p})`;cm.style.filter=p>.99?"":`blur(${(1-p)*6}px)`},1,.4);
+function openC(){cs.end=null;cm.hidden=false;scr2.hidden=false;cs.set(0);cs.go(1)}
+function closeC(){if(cm.hidden)return;cs.end=()=>{cm.hidden=true;scr2.hidden=true};cs.go(0)}
+$("qc").onclick=openC;$("cx").onclick=closeC;scr2.onclick=closeC;addEventListener("keydown",e=>{if(e.key==="Escape")closeC()});
+
+/* Файлы */
+let files=[];
+$("add").onclick=()=>$("fl").click();
+$("fl").onchange=()=>{[...$("fl").files].forEach(f=>{files.push(f);chip(f)});$("fl").value=""};
+function chip(f){
+  const el=document.createElement("div");el.className="chip";el.innerHTML="<span>"+esc(f.name)+"</span><button type=\"button\" aria-label=\"Удалить\">✕</button>";
+  $("chips").appendChild(el);press(el.querySelector("button"));
+  const s=Spring(0,v=>{el.style.opacity=v;el.style.transform=`scale(${.8+.2*v})`;el.style.filter=v>.99?"":`blur(${(1-v)*5}px)`},.75,.35);s.set(0);s.go(1);
+  el.querySelector("button").onclick=()=>{files=files.filter(x=>x!==f);const o=Spring(1,v=>{el.style.opacity=v;el.style.transform=`scale(${.8+.2*v})`},1,.25);o.end=()=>el.remove();o.go(0)}}
+
+/* Сообщения и встряска формы */
+const shake=Spring(0,x=>$("f").style.transform=x===0?"":`translateX(${x}px)`,.3,.3);
+function msg(t){$("m").innerHTML=t?'<div class="msg">'+esc(t)+'</div>':"";if(t){shake.set(12);shake.go(0)}}
+
+/* Адрес вашего Cloudflare Worker (см. README) */
+const WORKER_URL="https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev";
+if(closed){$("f").hidden=true;$("closed").hidden=false}
+
+/* Отправка */
+async function submit(){
+  if(sent||busy||$("f").hidden)return;
+  msg("");
+  const v={fio:$("fio").value.trim(),phone:$("ph").value.trim(),title:$("ttl").value.trim(),topic:$("tpc").value.trim(),count:sn.v,minutes:sd.v,desc:$("ds").value.trim(),link:$("lk").value.trim()};
+  if(new Date()>=new Date(2026,11,19))return msg("Приём заявок завершён.");
+  if(v.fio.split(/\s+/).length<2)return msg("Укажите ФИО полностью.");
+  if(v.phone.replace(/\D/g,"").length<11)return msg("Проверьте номер телефона.");
+  if(!v.title)return msg("Укажите название номера.");
+  if(!v.topic)return msg("Укажите тему номера.");
+  if(!c1.on)return msg("Подтвердите соответствие критериям.");
+  if(!c2.on)return msg("Нужно согласие на обработку персональных данных.");
+  if(files.length>3)return msg("Прикрепите не более 3 файлов.");
+  const big=files.find(f=>f.size>20*1024*1024);if(big)return msg("Файл «"+big.name+"» больше 20 МБ. Вставьте ссылку на него.");
+  if(files.reduce((a,f)=>a+f.size,0)>40*1024*1024)return msg("Общий размер файлов больше 40 МБ. Вставьте ссылку.");
+  busy=true;$("b").disabled=true;$("b").textContent="Отправляем…";
+  try{
+    const fd=new FormData();
+    Object.entries(v).forEach(([k,x])=>fd.append(k,x));
+    fd.append("website",$("hp").value);fd.append("consent","1");
+    files.forEach(f=>fd.append("files",f,f.name));
+    const r=await fetch(WORKER_URL,{method:"POST",body:fd});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.ok)throw new Error(j.error||"Не удалось отправить заявку. Попробуйте ещё раз.");
+    sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();
+  }catch(e){msg((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз.");busy=false;$("b").disabled=false;$("b").textContent="Отправить заявку"}}
+$("b").onclick=submit;$("send").onclick=submit;
+
+/* Шторка: перетаскивание 1:1, проекция импульса, rubber-band сверху */
+const sheet=$("sheet"),scrim=$("scrim");
+const sy=Spring(800,y=>{sheet.style.transform=`translateY(${y}px)`;scrim.style.opacity=Math.max(0,1-Math.max(0,y)/420)},.8,.3);
+function openSheet(){sheet.hidden=false;scrim.hidden=false;sy.set(sheet.offsetHeight+80);sy.go(0)}
+function closeSheet(v){sy.end=()=>{sheet.hidden=true;scrim.hidden=true};sy.go(sheet.offsetHeight+80,v)}
+$("ok").onclick=()=>closeSheet(0);scrim.onclick=()=>closeSheet(0);
+let st=null;
+sheet.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;sheet.setPointerCapture(e.pointerId);sy.stop();sy.end=null;st={y0:e.clientY,base:sy.x,h:[[e.timeStamp,e.clientY]]}});
+sheet.addEventListener("pointermove",e=>{if(!st)return;let y=st.base+(e.clientY-st.y0);if(y<0)y=-rubber(-y,300);sy.set(y);st.h.push([e.timeStamp,e.clientY]);if(st.h.length>6)st.h.shift()});
+function rel(){if(!st)return;const h=st.h,a=h[0],b=h[h.length-1],v=b[0]>a[0]?(b[1]-a[1])/(b[0]-a[0])*1000:0;st=null;
+  const end=sy.x+project(v);(end>sheet.offsetHeight*.5)?closeSheet(v):sy.go(0,v)}
+sheet.addEventListener("pointerup",rel);sheet.addEventListener("pointercancel",rel);
+</script>
+</body>
+</html>
