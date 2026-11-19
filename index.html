@@ -52,8 +52,13 @@ textarea.in{border-radius:24px;resize:none}
 .sw button[aria-checked="true"]{background:var(--btn)}
 .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--ind);box-shadow:0 2px 6px rgba(0,0,0,.3)}
 .sw button[aria-checked="true"] .knob{background:var(--btnt)}
-.btn{width:100%;border:0;border-radius:999px;padding:16px;margin-top:18px;font:inherit;font-weight:600;background:var(--btn);color:var(--btnt);cursor:pointer}
-.btn:disabled{opacity:.55}
+.btn{position:relative;overflow:hidden;width:100%;border:0;border-radius:999px;padding:16px;margin-top:18px;font:inherit;font-weight:600;background:var(--btn);color:var(--btnt);cursor:pointer}
+.btn .lbl{position:relative}
+.btn .fill{position:absolute;inset:0;transform:scaleX(0);transform-origin:left center;background:var(--btnt);opacity:.2;will-change:transform}
+.btn.busy .fill{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.07}}
+@media (prefers-reduced-motion:reduce){.btn.busy .fill{animation:none}}
+.btn:disabled{opacity:.9;cursor:default}
 .msg{border-radius:20px;padding:12px 16px;margin-top:16px;font-size:15px;background:var(--glass);border:1px solid var(--ac)}
 .hint{color:var(--mut);font-size:13px;margin:6px 8px 0}
 .app{border-top:1px solid var(--edge2);padding:14px 0;font-size:14px}.app:first-child{border-top:0}
@@ -123,7 +128,7 @@ h1,h2,.crit div,.hint{text-wrap:balance}.sw span{text-wrap:pretty}.sw>span{flex:
       <button type="button" class="addf press" id="add"><b>+</b>Добавить файл</button>
       <input id="fl" type="file" accept="video/*,audio/*" multiple hidden>
       <div class="chips" id="chips"></div>
-      <div class="hint">До 300 МБ на файл, не более 3 файлов (всего до 600 МБ). Если больше — вставьте ссылку ниже.</div>
+      <div class="hint">До 300 МБ на файл, не более 3 файлов (всего до 600 МБ). Если больше — вставьте ссылку ниже. Большое видео может загружаться несколько минут.</div>
 
       <label for="lk">Ссылка на запись (необязательно)</label>
       <input class="in" id="lk" type="url" placeholder="https://…">
@@ -135,7 +140,8 @@ h1,h2,.crit div,.hint{text-wrap:balance}.sw span{text-wrap:pretty}.sw>span{flex:
         <button type="button" class="q press" id="qc" aria-label="Текст согласия">?</button></div>
 
       <div id="m"></div>
-      <button class="btn press" id="b">Отправить заявку</button>
+      <button class="btn press" id="b"><span class="fill"></span><span class="lbl">Отправить заявку</span></button>
+      <div class="hint" id="wait" hidden style="text-align:center">Не закрывайте и не сворачивайте страницу, пока не появится сообщение об успехе.</div>
     </form>
     <div id="done" class="card glass" hidden><h2>Заявка отправлена</h2><div class="dt">Спасибо! Мы свяжемся с вами по указанному номеру.</div></div>
   </section>
@@ -276,17 +282,27 @@ function msg(t){$("m").innerHTML=t?'<div class="msg">'+esc(t)+'</div>':"";if(t){
 const WORKER_URL="https://christmasart26.kocmoc98v.workers.dev";
 if(closed){$("f").hidden=true;$("closed").hidden=false}
 
+/* Кнопка отправки: заполняется по мере загрузки, пружинная анимация */
+const bt=$("b"),bl=bt.querySelector(".lbl"),bf=bt.querySelector(".fill");
+const bs=Spring(0,v=>bf.style.transform=`scaleX(${v})`,1,.45);
+function btn(text,pct){bl.textContent=text;bt.classList.toggle("busy",pct>=100);bs.go(Math.max(0,Math.min(1,pct/100)))}
+function btnReset(){bt.classList.remove("busy");bs.set(0);bl.textContent="Отправить заявку";$("wait").hidden=true}
+
 /* Загрузка файла прямо на Яндекс Диск по одноразовой ссылке от Worker (до 2 попыток) */
-function putFile(href,f,onp){return new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open("PUT",href);
-  let sent=false,done=false,timer=0;
-  const ok=()=>{if(!done){done=true;clearTimeout(timer);res()}},fail=e=>{if(!done){done=true;clearTimeout(timer);rej(e)}};
+function putFile(href,f,onp,p){return new Promise((res,rej)=>{
+  const x=new XMLHttpRequest();x.open("PUT",href);
+  let sent=false,done=false,poll=0,stop=0;
+  const fin=(fn,v)=>{if(!done){done=true;clearTimeout(poll);clearTimeout(stop);fn(v)}};
+  /* Яндекс сохраняет большой файл не мгновенно и может не отдавать ответ браузеру: спрашиваем у Worker, появился ли файл на Диске */
+  const check=async()=>{if(done)return;try{const j=await xhr("POST",WORKER_URL+"/upload/check",JSON.stringify({path:p}));if(j.ready)return fin(res)}catch(_){}poll=setTimeout(check,3000)};
   x.upload.onprogress=e=>e.lengthComputable&&onp(e.loaded);
-  /* Яндекс может долго отвечать или не отдавать ответ браузеру: когда байты отправлены, ждём не больше 30 с, наличие файла дальше проверит Worker */
-  x.upload.onload=()=>{sent=true;onp(f.size);timer=setTimeout(ok,30000)};
-  x.onload=()=>x.status>=200&&x.status<300?ok():(sent&&x.status===0?ok():fail(new Error("upload "+x.status)));
-  x.onerror=()=>sent?ok():fail(new TypeError("network"));
+  x.upload.onload=()=>{sent=true;onp(f.size);poll=setTimeout(check,3000);
+    stop=setTimeout(()=>{const er=new Error("Яндекс Диск слишком долго сохраняет файл. Попробуйте ещё раз или вставьте ссылку на запись.");er.fatal=true;fin(rej,er)},360000)};
+  x.onload=()=>x.status>=200&&x.status<300?fin(res):(sent&&x.status===0?0:fin(rej,new Error("upload "+x.status)));
+  x.onerror=()=>sent?0:fin(rej,new TypeError("network"));
   x.send(f)})}
-function xhr(method,url,body){return new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open(method,url);x.setRequestHeader("Content-Type","application/json");
+function xhr(method,url,body){return new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open(method,url);x.setRequestHeader("Content-Type","application/json");x.timeout=90000;
+  x.ontimeout=()=>rej(new Error("Сервер долго не отвечает. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз."));
   x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(_){}
     if(x.status>=200&&x.status<300&&j.ok)res(j);else{const er=new Error(j.error||"Не удалось выполнить запрос. Попробуйте ещё раз.");er.fatal=x.status>=400&&x.status<500;rej(er)}};
   x.onerror=()=>rej(new TypeError("network"));x.send(body)})}
@@ -297,7 +313,7 @@ async function uploadFile(f,onProg){
       stage="шаг 1, ответ Worker";
       const init=await xhr("POST",WORKER_URL+"/upload/init",JSON.stringify({name:f.name,size:f.size,type:f.type}));
       stage="шаг 2, загрузка на Яндекс Диск";
-      await putFile(init.href,f,onProg);
+      await putFile(init.href,f,onProg,init.path);
       return{path:init.path,name:f.name,size:f.size}
     }catch(e){last=e;if(e.fatal)throw e}
   }
@@ -320,15 +336,15 @@ async function submit(){
   if(files.some(f=>!f.size))return msg("Один из файлов пустой. Выберите другой.");
   const big=files.find(f=>f.size>300*1024*1024);if(big)return msg("Файл «"+big.name+"» больше 300 МБ. Вставьте ссылку на него.");
   if(files.reduce((a,f)=>a+f.size,0)>600*1024*1024)return msg("Общий размер файлов больше 600 МБ. Вставьте ссылку.");
-  busy=true;$("b").disabled=true;$("b").textContent="Отправляем…";
+  busy=true;$("b").disabled=true;$("wait").hidden=!files.length;btn("Отправляем…",files.length?0:100);
   try{
     const total=files.reduce((a,f)=>a+f.size,0)||1;let base=0;const up=[];
-    const prog=l=>{const p=Math.floor((base+l)/total*100);$("b").textContent=(base+l>=total)?"Завершаем загрузку…":"Загружаем… "+Math.min(99,p)+"%"};
+    const prog=l=>{const p=Math.floor((base+l)/total*100);if(base+l>=total)btn("Сохраняем файл на Диск…",100);else btn("Загружаем… "+Math.min(99,p)+"%",p)};
     for(const f of files){up.push(await uploadFile(f,prog));base+=f.size}
-    $("b").textContent="Отправляем…";
+    btn("Отправляем…",100);
     await xhr("POST",WORKER_URL+"/submit",JSON.stringify({...v,consent:"1",website:$("hp").value,files:up}));
     sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();
-  }catch(e){msg(e instanceof TypeError?"Нет связи с сервером. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз.":((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз."));busy=false;$("b").disabled=false;$("b").textContent="Отправить заявку"}}
+  }catch(e){msg(e instanceof TypeError?"Нет связи с сервером. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз.":((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз."));busy=false;$("b").disabled=false;btnReset()}}
 $("b").onclick=submit;$("send").onclick=submit;
 
 /* Шторка: перетаскивание 1:1, проекция импульса, rubber-band сверху */
