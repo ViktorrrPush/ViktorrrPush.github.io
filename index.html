@@ -301,7 +301,7 @@ async function submit(){
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!j.ok)throw new Error(j.error||"Не удалось отправить заявку. Попробуйте ещё раз.");
     sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();
-  }catch(e){msg((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз.");busy=false;$("b").disabled=false;$("b").textContent="Отправить заявку"}}
+  }catch(e){msg(e instanceof TypeError?"Нет ответа от сервера. Если заявка уже пришла в Telegram, отправлять повторно не нужно.":((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз."));busy=false;$("b").disabled=false;$("b").textContent="Отправить заявку"}}
 $("b").onclick=submit;$("send").onclick=submit;
 
 /* Шторка: перетаскивание 1:1, проекция импульса, rubber-band сверху */
