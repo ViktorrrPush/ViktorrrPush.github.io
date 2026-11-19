@@ -273,7 +273,7 @@ const shake=Spring(0,x=>$("f").style.transform=x===0?"":`translateX(${x}px)`,.3,
 function msg(t){$("m").innerHTML=t?'<div class="msg">'+esc(t)+'</div>':"";if(t){shake.set(12);shake.go(0)}}
 
 /* Адрес вашего Cloudflare Worker (см. README) */
-const WORKER_URL="https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev";
+const WORKER_URL="https://christmasart26.kocmoc98v.workers.dev";
 if(closed){$("f").hidden=true;$("closed").hidden=false}
 
 /* Отправка */
