@@ -286,15 +286,18 @@ function xhr(method,url,body){return new Promise((res,rej)=>{const x=new XMLHttp
     if(x.status>=200&&x.status<300&&j.ok)res(j);else{const er=new Error(j.error||"Не удалось выполнить запрос. Попробуйте ещё раз.");er.fatal=x.status>=400&&x.status<500;rej(er)}};
   x.onerror=()=>rej(new TypeError("network"));x.send(body)})}
 async function uploadFile(f,onProg){
-  let last;
+  let last,stage="";
   for(let t=0;t<2;t++){
     try{
+      stage="шаг 1, ответ Worker";
       const init=await xhr("POST",WORKER_URL+"/upload/init",JSON.stringify({name:f.name,size:f.size,type:f.type}));
+      stage="шаг 2, загрузка на Яндекс Диск";
       await putFile(init.href,f,onProg);
       return{path:init.path,name:f.name,size:f.size}
     }catch(e){last=e;if(e.fatal)throw e}
   }
-  throw new Error("Не удалось загрузить «"+f.name+"». Проверьте связь или вставьте ссылку на запись ниже.")}
+  const why=last instanceof TypeError?"нет соединения или запрос заблокирован браузером":((last&&last.message)||"неизвестная ошибка");
+  throw new Error("Не удалось загрузить «"+f.name+"» ("+stage+": "+why+"). Вставьте ссылку на запись ниже.")}
 
 /* Отправка */
 async function submit(){
