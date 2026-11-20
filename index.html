@@ -291,13 +291,15 @@ function btnReset(){bt.classList.remove("busy");bs.set(0);bl.textContent="Отп
 /* Загрузка файла прямо на Яндекс Диск по одноразовой ссылке от Worker (до 2 попыток) */
 function putFile(href,f,onp,p){return new Promise((res,rej)=>{
   const x=new XMLHttpRequest();x.open("PUT",href);
-  let sent=false,done=false,poll=0,stop=0;
+  let sent=false,done=false,poll=0,stop=0,bad=0;
   const fin=(fn,v)=>{if(!done){done=true;clearTimeout(poll);clearTimeout(stop);fn(v)}};
-  /* Яндекс сохраняет большой файл не мгновенно и может не отдавать ответ браузеру: спрашиваем у Worker, появился ли файл на Диске */
-  const check=async()=>{if(done)return;try{const j=await xhr("POST",WORKER_URL+"/upload/check",JSON.stringify({path:p}));if(j.ready)return fin(res)}catch(_){}poll=setTimeout(check,3000)};
-  x.upload.onprogress=e=>e.lengthComputable&&onp(e.loaded);
-  x.upload.onload=()=>{sent=true;onp(f.size);poll=setTimeout(check,3000);
+  /* Яндекс сохраняет файл не мгновенно и может не отдавать ответ браузеру: спрашиваем у Worker, появился ли файл на Диске.
+     Если проверка не отвечает 3 раза подряд, идём дальше: наличие файла всё равно проверит Worker при отправке заявки */
+  const check=async()=>{if(done)return;try{const j=await xhr("POST",WORKER_URL+"/upload/check",JSON.stringify({path:p}));bad=0;if(j.ready)return fin(res)}catch(_){if(++bad>=3)return fin(res)}poll=setTimeout(check,3000)};
+  const markSent=()=>{if(sent)return;sent=true;onp(f.size);poll=setTimeout(check,3000);
     stop=setTimeout(()=>{const er=new Error("Яндекс Диск слишком долго сохраняет файл. Попробуйте ещё раз или вставьте ссылку на запись.");er.fatal=true;fin(rej,er)},360000)};
+  x.upload.onprogress=e=>{if(!e.lengthComputable)return;onp(e.loaded);if(e.loaded>=f.size)markSent()};
+  x.upload.onload=markSent;
   x.onload=()=>x.status>=200&&x.status<300?fin(res):(sent&&x.status===0?0:fin(rej,new Error("upload "+x.status)));
   x.onerror=()=>sent?0:fin(rej,new TypeError("network"));
   x.send(f)})}
