@@ -301,14 +301,14 @@ function putFile(href,f,onp){return new Promise((res,rej)=>{
   x.send(f)})}
 /* После отправки заявки ждём, пока Яндекс сохранит файл, и просим функцию прислать ссылку в Telegram */
 function waitReady(p){return new Promise(res=>{let bad=0,n=0;const t=async()=>{try{const j=await xhr("POST",WORKER_URL,JSON.stringify({action:"check",path:p}));bad=0;if(j.ready)return res(true)}catch(_){if(++bad>=5)return res(false)}if(++n>120)return res(false);setTimeout(t,3000)};t()})}
-let pending=false;
+let pending=false,wcancel=false;
 const setStat=t=>document.querySelectorAll(".fstat").forEach(e=>{e.hidden=!t;e.textContent=t||""});
 addEventListener("beforeunload",e=>{if(pending){e.preventDefault();e.returnValue=""}});
 async function watchFiles(up,label){
   if(!up.length)return;pending=true;
   setStat("Файл ещё сохраняется на Диск. Не закрывайте страницу, пока не появится «Файл сохранён».");
   let allOk=true;
-  for(const f of up){const ok=await waitReady(f.path);allOk=allOk&&ok;
+  for(const f of up){const ok=await waitReady(f.path);if(wcancel)return;allOk=allOk&&ok;
     try{await xhr("POST",WORKER_URL,JSON.stringify({action:"finish",path:f.path,label,failed:!ok}))}catch(_){}}
   pending=false;
   setStat(allOk?"Файл сохранён ✓ Ссылка отправлена организаторам.":"Файл не удалось сохранить. Организаторы получили уведомление и свяжутся с вами.")}
@@ -341,14 +341,14 @@ async function submit(){
   if(v.fio.split(/\s+/).length<2)return msg("Укажите ФИО полностью.");
   if(v.phone.replace(/\D/g,"").length<11)return msg("Проверьте номер телефона.");
   if(!v.title)return msg("Укажите название номера.");
-  if(!v.topic)return msg("Укажите тему номера.");
+  if(v.topic.length<2)return msg("Тема слишком короткая: напишите хотя бы пару слов.");
   if(!c1.on)return msg("Подтвердите соответствие критериям.");
   if(!c2.on)return msg("Нужно согласие на обработку персональных данных.");
   if(files.length>3)return msg("Прикрепите не более 3 файлов.");
   if(files.some(f=>!f.size))return msg("Один из файлов пустой. Выберите другой.");
   const big=files.find(f=>f.size>300*1024*1024);if(big)return msg("Файл «"+big.name+"» больше 300 МБ. Вставьте ссылку на него.");
   if(files.reduce((a,f)=>a+f.size,0)>600*1024*1024)return msg("Общий размер файлов больше 600 МБ. Вставьте ссылку.");
-  busy=true;$("b").disabled=true;$("wait").hidden=!files.length;btn("Отправляем…",files.length?0:100);
+  busy=true;wcancel=false;$("b").disabled=true;$("wait").hidden=!files.length;btn("Отправляем…",files.length?0:100);
   try{
     const total=files.reduce((a,f)=>a+f.size,0)||1;let base=0;const up=[],t0=Date.now();
     const prog=l=>{const p=Math.floor((base+l)/total*100),sec=(Date.now()-t0)/1000;
@@ -356,12 +356,12 @@ async function submit(){
       let eta="";if(sec>4&&p>=2){const left=(total-base-l)/((base+l)/sec);eta=left<60?" · ещё ~"+Math.max(5,Math.round(left/5)*5)+" с":" · ещё ~"+Math.round(left/60)+" мин"}
       const spd=(sec>4&&base+l>0)?" · "+(((base+l)/sec)/1048576).toFixed(1).replace(".",",")+" МБ/с":"";
       btn(spd?Math.min(99,p)+"%"+spd+eta:"Загружаем… "+Math.min(99,p)+"%"+eta,p)};
-    for(const f of files){up.push(await uploadFile(f,prog));base+=f.size}
+    for(const f of files){up.push(f._up||(f._up=await uploadFile(f,prog)));base+=f.size} /* повторная отправка не грузит файл заново */
     btn("Отправляем…",100);
     watchFiles(up,v.title+" — "+v.fio+", "+v.phone); /* параллельно: ссылка на файл придёт, даже если ответ на заявку задержится */
     await xhr("POST",WORKER_URL,JSON.stringify({action:"submit",...v,consent:"1",website:$("hp").value,files:up}));
     sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();
-  }catch(e){msg(e instanceof TypeError?"Нет связи с сервером. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз.":((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз."));busy=false;$("b").disabled=false;btnReset()}}
+  }catch(e){if(e&&e.fatal){wcancel=true;pending=false;setStat("")}msg(e instanceof TypeError?"Нет связи с сервером. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз.":((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз."));busy=false;$("b").disabled=false;btnReset()}}
 $("b").onclick=submit;$("send").onclick=submit;
 
 /* Шторка: перетаскивание 1:1, проекция импульса, rubber-band сверху */
