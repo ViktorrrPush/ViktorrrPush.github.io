@@ -290,10 +290,11 @@ function btnReset(){bt.classList.remove("busy");bs.set(0);bl.textContent="Отп
 
 /* Загрузка файла прямо на Яндекс Диск по одноразовой ссылке от Worker (до 2 попыток) */
 function putFile(href,f,onp){return new Promise((res,rej)=>{
-  const x=new XMLHttpRequest();x.open("PUT",href);let sent=false,done=false;
+  const x=new XMLHttpRequest();x.open("PUT",href);let sent=false,done=false,fb=0;
   const ok=()=>{if(!done){done=true;res()}},fail=e=>{if(!done){done=true;rej(e)}};
-  const markSent=()=>{if(sent)return;sent=true;onp(f.size);ok()}; /* все байты отправлены: сохранение на Диске дальше идёт у Яндекса */
-  x.upload.onprogress=e=>{if(!e.lengthComputable)return;onp(e.loaded);if(e.loaded>=f.size)markSent()};
+  const markSent=()=>{if(sent)return;sent=true;clearTimeout(fb);onp(f.size);ok()}; /* все байты отправлены: сохранение на Диске дальше идёт у Яндекса */
+  /* заявку шлём, когда запрос с файлом реально отправлен (upload.onload), иначе хвост загрузки забивает канал и ответ на заявку не доходит; запасной вариант: 25 с после 100% */
+  x.upload.onprogress=e=>{if(!e.lengthComputable)return;onp(e.loaded);if(e.loaded>=f.size&&!fb)fb=setTimeout(markSent,25000)};
   x.upload.onload=markSent;
   x.onload=()=>x.status>=200&&x.status<300?ok():(sent&&x.status===0?0:fail(new Error("upload "+x.status)));
   x.onerror=()=>sent?0:fail(new TypeError("network"));
@@ -357,8 +358,9 @@ async function submit(){
       btn(spd?Math.min(99,p)+"%"+spd+eta:"Загружаем… "+Math.min(99,p)+"%"+eta,p)};
     for(const f of files){up.push(await uploadFile(f,prog));base+=f.size}
     btn("Отправляем…",100);
+    watchFiles(up,v.title+" — "+v.fio+", "+v.phone); /* параллельно: ссылка на файл придёт, даже если ответ на заявку задержится */
     await xhr("POST",WORKER_URL,JSON.stringify({action:"submit",...v,consent:"1",website:$("hp").value,files:up}));
-    sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();watchFiles(up,v.title+" — "+v.fio);
+    sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();
   }catch(e){msg(e instanceof TypeError?"Нет связи с сервером. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз.":((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз."));busy=false;$("b").disabled=false;btnReset()}}
 $("b").onclick=submit;$("send").onclick=submit;
 
