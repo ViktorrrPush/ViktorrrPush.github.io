@@ -143,7 +143,7 @@ h1,h2,.crit div,.hint{text-wrap:balance}.sw span{text-wrap:pretty}.sw>span{flex:
       <button class="btn press" id="b"><span class="fill"></span><span class="lbl">Отправить заявку</span></button>
       <div class="hint" id="wait" hidden style="text-align:center">Не закрывайте и не сворачивайте страницу, пока не появится сообщение об успехе.</div>
     </form>
-    <div id="done" class="card glass" hidden><h2>Заявка отправлена</h2><div class="dt">Спасибо! Мы свяжемся с вами по указанному номеру.</div></div>
+    <div id="done" class="card glass" hidden><h2>Заявка отправлена</h2><div class="dt">Спасибо! Мы свяжемся с вами по указанному номеру.</div><div class="hint fstat" hidden style="text-align:center;margin-top:10px"></div></div>
   </section>
 
 </div>
@@ -175,7 +175,7 @@ h1,h2,.crit div,.hint{text-wrap:balance}.sw span{text-wrap:pretty}.sw>span{flex:
   <div class="grab"></div>
   <div class="logo glass" style="width:68px;height:68px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
   <h2>Заявка отправлена</h2>
-  <div class="dt">Спасибо! Мы свяжемся с вами по указанному номеру.</div>
+  <div class="dt">Спасибо! Мы свяжемся с вами по указанному номеру.</div><div class="hint fstat" hidden style="text-align:center;margin-top:10px"></div>
   <button class="btn press" id="ok">Готово</button>
 </div>
 
@@ -269,7 +269,7 @@ let files=[];
 $("add").onclick=()=>$("fl").click();
 $("fl").onchange=()=>{[...$("fl").files].forEach(f=>{files.push(f);chip(f)});$("fl").value=""};
 function chip(f){
-  const el=document.createElement("div");el.className="chip";el.innerHTML="<span>"+esc(f.name)+"</span><button type=\"button\" aria-label=\"Удалить\">✕</button>";
+  const el=document.createElement("div");el.className="chip";el.innerHTML="<span>"+esc(f.name)+" · "+Math.max(1,Math.round(f.size/1048576))+" МБ</span><button type=\"button\" aria-label=\"Удалить\">✕</button>";
   $("chips").appendChild(el);press(el.querySelector("button"));
   const s=Spring(0,v=>{el.style.opacity=v;el.style.transform=`scale(${.8+.2*v})`;el.style.filter=v>.99?"":`blur(${(1-v)*5}px)`},.75,.35);s.set(0);s.go(1);
   el.querySelector("button").onclick=()=>{files=files.filter(x=>x!==f);const o=Spring(1,v=>{el.style.opacity=v;el.style.transform=`scale(${.8+.2*v})`},1,.25);o.end=()=>el.remove();o.go(0)}}
@@ -289,20 +289,29 @@ function btn(text,pct){bl.textContent=text;bt.classList.toggle("busy",pct>=100);
 function btnReset(){bt.classList.remove("busy");bs.set(0);bl.textContent="Отправить заявку";$("wait").hidden=true}
 
 /* Загрузка файла прямо на Яндекс Диск по одноразовой ссылке от Worker (до 2 попыток) */
-function putFile(href,f,onp,p){return new Promise((res,rej)=>{
-  const x=new XMLHttpRequest();x.open("PUT",href);
-  let sent=false,done=false,poll=0,stop=0,bad=0;
-  const fin=(fn,v)=>{if(!done){done=true;clearTimeout(poll);clearTimeout(stop);fn(v)}};
-  /* Яндекс сохраняет файл не мгновенно и может не отдавать ответ браузеру: спрашиваем у Worker, появился ли файл на Диске.
-     Если проверка не отвечает 3 раза подряд, идём дальше: наличие файла всё равно проверит Worker при отправке заявки */
-  const check=async()=>{if(done)return;try{const j=await xhr("POST",WORKER_URL,JSON.stringify({action:"check",path:p}));bad=0;if(j.ready)return fin(res)}catch(_){if(++bad>=3)return fin(res)}poll=setTimeout(check,3000)};
-  const markSent=()=>{if(sent)return;sent=true;onp(f.size);poll=setTimeout(check,3000);
-    stop=setTimeout(()=>{const er=new Error("Яндекс Диск слишком долго сохраняет файл. Попробуйте ещё раз или вставьте ссылку на запись.");er.fatal=true;fin(rej,er)},360000)};
+function putFile(href,f,onp){return new Promise((res,rej)=>{
+  const x=new XMLHttpRequest();x.open("PUT",href);let sent=false,done=false;
+  const ok=()=>{if(!done){done=true;res()}},fail=e=>{if(!done){done=true;rej(e)}};
+  const markSent=()=>{if(sent)return;sent=true;onp(f.size);ok()}; /* все байты отправлены: сохранение на Диске дальше идёт у Яндекса */
   x.upload.onprogress=e=>{if(!e.lengthComputable)return;onp(e.loaded);if(e.loaded>=f.size)markSent()};
   x.upload.onload=markSent;
-  x.onload=()=>x.status>=200&&x.status<300?fin(res):(sent&&x.status===0?0:fin(rej,new Error("upload "+x.status)));
-  x.onerror=()=>sent?0:fin(rej,new TypeError("network"));
+  x.onload=()=>x.status>=200&&x.status<300?ok():(sent&&x.status===0?0:fail(new Error("upload "+x.status)));
+  x.onerror=()=>sent?0:fail(new TypeError("network"));
   x.send(f)})}
+/* После отправки заявки ждём, пока Яндекс сохранит файл, и просим функцию прислать ссылку в Telegram */
+function waitReady(p){return new Promise(res=>{let bad=0,n=0;const t=async()=>{try{const j=await xhr("POST",WORKER_URL,JSON.stringify({action:"check",path:p}));bad=0;if(j.ready)return res(true)}catch(_){if(++bad>=5)return res(false)}if(++n>120)return res(false);setTimeout(t,3000)};t()})}
+let pending=false;
+const setStat=t=>document.querySelectorAll(".fstat").forEach(e=>{e.hidden=!t;e.textContent=t||""});
+addEventListener("beforeunload",e=>{if(pending){e.preventDefault();e.returnValue=""}});
+async function watchFiles(up,label){
+  if(!up.length)return;pending=true;
+  setStat("Файл ещё сохраняется на Диск. Не закрывайте страницу, пока не появится «Файл сохранён».");
+  let allOk=true;
+  for(const f of up){const ok=await waitReady(f.path);allOk=allOk&&ok;
+    try{await xhr("POST",WORKER_URL,JSON.stringify({action:"finish",path:f.path,label,failed:!ok}))}catch(_){}}
+  pending=false;
+  setStat(allOk?"Файл сохранён ✓ Ссылка отправлена организаторам.":"Файл не удалось сохранить. Организаторы получили уведомление и свяжутся с вами.")}
+
 function xhr(method,url,body){return new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open(method,url);x.timeout=90000;
   x.ontimeout=()=>rej(new Error("Сервер долго не отвечает. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз."));
   x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(_){}
@@ -315,7 +324,7 @@ async function uploadFile(f,onProg){
       stage="шаг 1, ответ Worker";
       const init=await xhr("POST",WORKER_URL,JSON.stringify({action:"init",name:f.name,size:f.size,type:f.type}));
       stage="шаг 2, загрузка на Яндекс Диск";
-      await putFile(init.href,f,onProg,init.path);
+      await putFile(init.href,f,onProg);
       return{path:init.path,name:f.name,size:f.size}
     }catch(e){last=e;if(e.fatal)throw e}
   }
@@ -342,14 +351,14 @@ async function submit(){
   try{
     const total=files.reduce((a,f)=>a+f.size,0)||1;let base=0;const up=[],t0=Date.now();
     const prog=l=>{const p=Math.floor((base+l)/total*100),sec=(Date.now()-t0)/1000;
-      if(base+l>=total){btn("Сохраняем файл на Диск…",100);return}
+      if(base+l>=total){btn("Отправляем заявку…",100);return}
       let eta="";if(sec>4&&p>=2){const left=(total-base-l)/((base+l)/sec);eta=left<60?" · ещё ~"+Math.max(5,Math.round(left/5)*5)+" с":" · ещё ~"+Math.round(left/60)+" мин"}
       const spd=(sec>4&&base+l>0)?" · "+(((base+l)/sec)/1048576).toFixed(1).replace(".",",")+" МБ/с":"";
       btn(spd?Math.min(99,p)+"%"+spd+eta:"Загружаем… "+Math.min(99,p)+"%"+eta,p)};
     for(const f of files){up.push(await uploadFile(f,prog));base+=f.size}
     btn("Отправляем…",100);
     await xhr("POST",WORKER_URL,JSON.stringify({action:"submit",...v,consent:"1",website:$("hp").value,files:up}));
-    sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();
+    sent=true;busy=false;$("f").hidden=true;$("done").hidden=false;sendS.go(0);openSheet();watchFiles(up,v.title+" — "+v.fio);
   }catch(e){msg(e instanceof TypeError?"Нет связи с сервером. Если заявка уже пришла в Telegram, повторно отправлять не нужно, иначе попробуйте ещё раз.":((e&&e.message)||"Не удалось отправить заявку. Попробуйте ещё раз."));busy=false;$("b").disabled=false;btnReset()}}
 $("b").onclick=submit;$("send").onclick=submit;
 
